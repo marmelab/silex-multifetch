@@ -1,0 +1,30 @@
+{
+    "name": "marmelab/silex-multifetch",
+    "description": "Silex Provider adding multifetch capabilities to your application",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jérôme Macias",
+            "email": "jerome@marmelab.com"
+        }
+    ],
+    "require": {
+        "silex/silex": "~1.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.2.0",
+        "symfony/browser-kit": "~2.3",
+        "symfony/css-selector": "~2.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Marmelab\\Multifetch\\": "src/",
+            "Marmelab\\MultifetchTest\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}
