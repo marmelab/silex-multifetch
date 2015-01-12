@@ -61,9 +61,6 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
                 'body' => '{"field_2_1":"value_2_1","field_2":3}',
             ),
         ), $responses);
-
-        $request = Request::create('/multi/?one=/url2&two=/url1');
-        $response = $app->handle($request);
     }
 
     public function testMultifetchCustomUrl()
@@ -119,9 +116,6 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
                 'body' => '{"field_2_1":"value_2_1","field_2":3}',
             ),
         ), $responses);
-
-        $request = Request::create('/multi/?one=/url2&two=/url1');
-        $response = $app->handle($request);
     }
 
     public function testMultifetchRespectOrder()
@@ -230,9 +224,6 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
                 'body' => '{"field_2_1":"value_2_1","field_2":3}',
             ),
         ), $responses);
-
-        $request = Request::create('/multi/?one=/url2&two=/url1');
-        $response = $app->handle($request);
     }
 
     public function testMultifetchParallelizedParameter()
@@ -286,9 +277,6 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
                 'body' => '{"field_2_1":"value_2_1","field_2":3}',
             ),
         ), $responses);
-
-        $request = Request::create('/multi/?one=/url2&two=/url1');
-        $response = $app->handle($request);
     }
 
     public function testMultifetchParallelizedGlobalOveriden()
@@ -344,9 +332,6 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
                 'body' => '{"field_2_1":"value_2_1","field_2":3}',
             ),
         ), $responses);
-
-        $request = Request::create('/multi/?one=/url2&two=/url1');
-        $response = $app->handle($request);
     }
 
     private function getReponsesAsArray(Response $response)
