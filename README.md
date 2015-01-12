@@ -31,7 +31,7 @@ make test
 
 ## Usage
 
-Send a request to the route where the provider is listening, passing the requests to fetch in parallel as a JSON object in the request body. For instance, to fetch `/products/1` and `/users` in parallel, make the following request:
+Send a request to the route where the provider is listening, passing the requests to fetch as query parameters. For instance, to fetch `/products/1` and `/users` into one HTTP call, make the following request:
 
 ```
 GET /multi?product=/product/1&all_users=/users HTTP/1.1
