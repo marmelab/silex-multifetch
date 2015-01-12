@@ -13,7 +13,6 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
     public function testMultifetch()
     {
         $app = new Application();
-        $app['debug'] = true;
 
         $app->register(new HttpFragmentServiceProvider());
         $app->register(new MultifetchServiceProvider());
@@ -62,6 +61,25 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
                 'body' => '{"field_2_1":"value_2_1","field_2":3}',
             ),
         ), $responses);
+
+        $request = Request::create('/multi/?one=/url2&two=/url1');
+        $response = $app->handle($request);
+    }
+
+    public function testMultifetchRespectOrder()
+    {
+        $app = new Application();
+
+        $app->register(new HttpFragmentServiceProvider());
+        $app->register(new MultifetchServiceProvider());
+
+        $app->get('/url1', function () use ($app) {
+            return $app->json(array('field_1_1' => 'value_1_1', 'field_2' => 2));
+        });
+
+        $app->get('/url2', function () use ($app) {
+            return $app->json(array('field_2_1' => 'value_2_1', 'field_2' => 3));
+        });
 
         $request = Request::create('/multi/?one=/url2&two=/url1');
         $response = $app->handle($request);
