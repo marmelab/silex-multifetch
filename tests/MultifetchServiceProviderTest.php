@@ -458,15 +458,10 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
         ), $responses);
     }
 
-
     private function getReponsesAsArray(Response $response)
     {
         $responses = json_decode($response->getContent(), true);
         foreach ($responses as $key => $singleResponse) {
-            if (0 === strpos($key, '_')) {
-                continue;
-            }
-
             $headers = array();
             foreach ($singleResponse['headers'] as $header) {
                 if ('date' === $header['name']) {
