@@ -10,6 +10,7 @@ class MultifetchServiceProvider implements ServiceProviderInterface
 {
     public function register(Application $app)
     {
+        $app['multifetch.methods'] = array('POST');
         $app['multifetch.url'] = 'multi';
         $app['multifetch.parallel'] = false;
         $app['multifetch.headers'] = true;
@@ -25,27 +26,31 @@ class MultifetchServiceProvider implements ServiceProviderInterface
                 'headers' => (bool) $app['multifetch.headers'],
             );
 
-            $controllers
-                ->get('/', function (Application $app) use ($multifetcher, $renderer, $options) {
-                    $responses = $multifetcher->fetch($app['request']->query->all(), $renderer, $options);
+            if (in_array('GET', $app['multifetch.methods'])) {
+                $controllers
+                    ->get('/', function (Application $app) use ($multifetcher, $renderer, $options) {
+                        $responses = $multifetcher->fetch($app['request']->query->all(), $renderer, $options);
 
-                    return $app->json($responses);
-                })
-            ;
+                        return $app->json($responses);
+                    })
+                ;
+            }
 
-            $controllers
-                ->post('/', function (Application $app) use ($multifetcher, $renderer, $options) {
-                    $responses = $multifetcher->fetch($app['request']->request->all(), $renderer, $options);
+            if (in_array('POST', $app['multifetch.methods'])) {
+                $controllers
+                    ->post('/', function (Application $app) use ($multifetcher, $renderer, $options) {
+                        $responses = $multifetcher->fetch($app['request']->request->all(), $renderer, $options);
 
-                    return $app->json($responses);
-                })
-                ->before(function (Request $request) {
-                    if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
-                        $data = json_decode($request->getContent(), true);
-                        $request->request->replace(is_array($data) ? $data : array());
-                    }
-                })
-            ;
+                        return $app->json($responses);
+                    })
+                    ->before(function (Request $request) {
+                        if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
+                            $data = json_decode($request->getContent(), true);
+                            $request->request->replace(is_array($data) ? $data : array());
+                        }
+                    })
+                ;
+            }
 
             $app['controllers']->mount($app['multifetch.url'], $controllers);
         };

@@ -53,7 +53,9 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
         $app = new Application();
 
         $app->register(new HttpFragmentServiceProvider());
-        $app->register(new MultifetchServiceProvider());
+        $app->register(new MultifetchServiceProvider(), array(
+            'multifetch.methods' => array('GET'),
+        ));
 
         $app->get('/url1', function () use ($app) {
             return $app->json(array('field_1_1' => 'value_1_1', 'field_2' => 2));
@@ -100,6 +102,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
 
         $app->register(new HttpFragmentServiceProvider());
         $app->register(new MultifetchServiceProvider(), array(
+            'multifetch.methods' => array('GET', 'POST'),
             'multifetch.url' => '',
         ));
 
@@ -123,7 +126,9 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
         $app = new Application();
 
         $app->register(new HttpFragmentServiceProvider());
-        $app->register(new MultifetchServiceProvider());
+        $app->register(new MultifetchServiceProvider(), array(
+            'multifetch.methods' => array('GET'),
+        ));
 
         $app->get('/url1', function () use ($app) {
             return $app->json(array('field_1_1' => 'value_1_1', 'field_2' => 2));
@@ -149,6 +154,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
 
         $app->register(new HttpFragmentServiceProvider());
         $app->register(new MultifetchServiceProvider(), array(
+            'multifetch.methods' => array('GET'),
             'multifetch.parallel' => 1,
         ));
 
@@ -172,7 +178,9 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
         $app = new Application();
 
         $app->register(new HttpFragmentServiceProvider());
-        $app->register(new MultifetchServiceProvider());
+        $app->register(new MultifetchServiceProvider(), array(
+            'multifetch.methods' => array('GET'),
+        ));
 
         $app->get('/url1', function () use ($app) {
             return $app->json(array('field_1_1' => 'value_1_1', 'field_2' => 2));
@@ -195,6 +203,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
 
         $app->register(new HttpFragmentServiceProvider());
         $app->register(new MultifetchServiceProvider(), array(
+            'multifetch.methods' => array('GET'),
             'multifetch.parallel' => 1,
         ));
 
@@ -258,6 +267,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
 
         $app->register(new HttpFragmentServiceProvider());
         $app->register(new MultifetchServiceProvider(), array(
+            'multifetch.methods' => array('GET'),
             'multifetch.headers' => false,
         ));
 
