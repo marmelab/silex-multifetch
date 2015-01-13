@@ -3,6 +3,7 @@
 namespace Marmelab\Multifetch;
 
 use KzykHys\Parallel\Parallel;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Multifetcher
 {
@@ -25,18 +26,28 @@ class Multifetcher
             $requests[$resource] = function () use ($resource, $url, $renderer) {
                 try {
                     $response = $renderer($url);
-                } catch (\Exception $e) {
-                    return false;
-                }
 
-                $headers = array();
-                foreach ($response->headers->all() as $name => $value) {
-                    $headers[] = array('name' => $name, 'value' => current($value));
+                } catch (HttpException $e) {
+                    $reflectionClass = new \ReflectionClass($e);
+                    $type = $reflectionClass->getShortName();
+
+                    return array(
+                        'code' => $e->getStatusCode(),
+                        'headers' => $this->formatHeaders($e->getHeaders()),
+                        'body' => json_encode(array('error' => $e->getMessage(), 'type' => $type)),
+                    );
+                } catch (\Exception $e) {
+
+                    return array(
+                        'code' => 500,
+                        'headers' => array(),
+                        'body' => json_encode(array('error' => $e->getMessage(), 'type' => 'InternalServerError')),
+                    );
                 }
 
                 return array(
                     'code' => $response->getStatusCode(),
-                    'headers' => $headers,
+                    'headers' => $this->formatHeaders($response->headers->all()),
                     'body' => $response->getContent(),
                 );
             };
@@ -44,24 +55,21 @@ class Multifetcher
 
         if ($parallelize) {
             $parallel = new Parallel();
-            $responses = $parallel->values($requests);
 
-        } else {
-            foreach ($requests as $resource => $callback) {
-                $responses[$resource] = $callback();
-            }
+            return $parallel->values($requests);
         }
 
-        $error = false;
-        foreach ($responses as $k => $response) {
-            if (false === $response) {
-                unset($responses[$k]);
-
-                $error = true;
-            }
+        foreach ($requests as $resource => $callback) {
+            $responses[$resource] = $callback();
         }
-        $responses['_error'] = $error;
 
         return $responses;
+    }
+
+    private function formatHeaders(array $headers)
+    {
+        return array_map(function ($name, $value) {
+            return array('name' => $name, 'value' => current($value));
+        }, array_keys($headers), $headers);
     }
 }

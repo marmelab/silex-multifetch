@@ -60,7 +60,6 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
                 ),
                 'body' => '{"field_2_1":"value_2_1","field_2":3}',
             ),
-            '_error' => false,
         ), $responses);
     }
 
@@ -116,7 +115,6 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
                 ),
                 'body' => '{"field_2_1":"value_2_1","field_2":3}',
             ),
-            '_error' => false,
         ), $responses);
     }
 
@@ -172,7 +170,6 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
                 ),
                 'body' => '{"field_2_1":"value_2_1","field_2":3}',
             ),
-            '_error' => false,
         ), $responses);
     }
 
@@ -226,7 +223,6 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
                 ),
                 'body' => '{"field_1_1":"value_1_1","field_2":2}',
             ),
-            '_error' => false,
         ), $responses);
     }
 
@@ -282,7 +278,6 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
                 ),
                 'body' => '{"field_2_1":"value_2_1","field_2":3}',
             ),
-            '_error' => false,
         ), $responses);
     }
 
@@ -336,7 +331,6 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
                 ),
                 'body' => '{"field_2_1":"value_2_1","field_2":3}',
             ),
-            '_error' => false,
         ), $responses);
     }
 
@@ -392,11 +386,10 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
                 ),
                 'body' => '{"field_2_1":"value_2_1","field_2":3}',
             ),
-            '_error' => false,
         ), $responses);
     }
 
-    public function testMultifetchWrongUrlToFetch()
+    public function testMultifetchRequestsError()
     {
         $app = new Application();
 
@@ -411,7 +404,11 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
             return $app->json(array('field_2_1' => 'value_2_1', 'field_2' => 3));
         });
 
-        $content = json_encode(array('one' => '/url1', 'two' => '/url2', 'three' => '/url3'));
+        $app->get('/url-alpha', function () use ($app) {
+            throw new \Exception('This is alpha ;)');
+        });
+
+        $content = json_encode(array('one' => '/url1', 'two' => '/url2', 'three' => '/url3', 'four' => '/url-alpha'));
         $server = array('CONTENT_TYPE' => 'application/json');
         $request = Request::create('/multi/', 'POST', array(), array(), array(), $server, $content);
         $response = $app->handle($request);
@@ -448,7 +445,16 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
                 ),
                 'body' => '{"field_2_1":"value_2_1","field_2":3}',
             ),
-            '_error' => true,
+            'three' => array(
+                'code' => 404,
+                'headers' => array(),
+                'body' => '{"error":"No route found for \"GET \/url3\"","type":"NotFoundHttpException"}',
+            ),
+            'four' => array(
+                'code' => 500,
+                'headers' => array(),
+                'body' => '{"error":"This is alpha ;)","type":"InternalServerError"}',
+            ),
         ), $responses);
     }
 

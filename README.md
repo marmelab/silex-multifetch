@@ -48,11 +48,11 @@ The provider will call both HTTP resources, and return a response with a composi
 ```json
 { 
     "product": {
-        "code": 200,                // Response code returned by the user route
-        "headers": [                                    // All response headers
+        "code": 200,
+        "headers": [
             { "name": "Content-Type", "value": "application/json" }
         ],
-        "body": "{ id: 1, name: \"ipad2\", stock: 34 }" // The actual json body
+        "body": "{ id: 1, name: \"ipad2\", stock: 34 }"
     },
     "all_users": {
         "code": 200,
@@ -61,7 +61,6 @@ The provider will call both HTTP resources, and return a response with a composi
         ],
         "body": "[{ id: 2459, login: \"paul\" }, { id: 7473, login: \"joe\" }]"
     },
-    "_error": false        // _error will be true if one of the requests failed
 }
 ```
 
@@ -73,7 +72,7 @@ Any header present in the multifetch request will be automatically added to all 
 GET /multi?product=/product/1&all_users=/users&_parallel=1 HTTP/1.1
 ```
 
-# Parallelize requests
+### Parallelize requests
 
 You can also fetch all requests in parallel using the `_parallel`  parameter:
 
@@ -100,6 +99,36 @@ Content-Type: application/json
 ```
 
 **Warning**: The `parallel` option forks a new thread for each sub-request, which may or may not be faster than executing all requests in series, depending on your usage scenario, and the amount of I/O spend in the subrequests.
+
+### Errors
+
+It's possible that one of your requested operation may throw an error.
+A similar response will be return, but with a custom status and body.
+Successfull requests will be returned, as normal, with a 200 status code.
+
+Here is a response example:
+
+```json
+{
+    "product": {
+        "code": 200,
+        "headers": [
+            { "name": "Content-Type", "value": "application/json" }
+        ],
+        "body": "{ id: 1, name: \"ipad2\", stock: 34 }"
+    },
+    "not_found": {
+        "code": 404,
+        "headers": [],
+        "body": "{ error: \"No route found for \\\"GET \\\/no-route\\\"\", type: \"NotFoundHttpException\" }"
+    },
+    "error": {
+        "code": 500,
+        "headers": [],
+        "body": "{ error: \"Oops! Something went wrong.\", type: \"InternalServerError\" }"
+    },
+}
+```
 
 ## License
 
