@@ -32,7 +32,7 @@ make test
 
 ## Usage
 
-Send a request to the route where the provider is listening, passing the requests to fetch as a JSON object in the request body. For instance, to fetch `/products/1` and `/users` on one HTTP call, make the following request:
+Send a request to the route where the provider is listening, passing the requests to fetch as a JSON object in the request body. For instance, to fetch `/products/1` and `/users` with a single HTTP request, make the following request:
 
 ```
 POST /multi HTTP/1.1
@@ -66,6 +66,14 @@ The provider will call both HTTP resources, and return a response with a composi
 
 Any header present in the multifetch request will be automatically added to all sub-requests.
 
+**Tip**: a GET route is available, the provider reads the query parameters to determine requests to fetch:
+
+```
+GET /multi?product=/product/1&all_users=/users&_parallel=1 HTTP/1.1
+```
+
+# Parallelize requests
+
 You can also fetch all requests in parallel using the `_parallel`  parameter:
 
 ```
@@ -88,12 +96,6 @@ Content-Type: application/json
     "all_users": "/users",
     "_parallel": false
 }
-```
-
-**Tip**: a GET route is available, the provider reads the query parameters to determine requests to fetch:
-
-```
-GET /multi?product=/product/1&all_users=/users&_parallel=1 HTTP/1.1
 ```
 
 **Warning**: The `parallel` option forks a new thread for each sub-request, which may or may not be faster than executing all requests in series, depending on your usage scenario, and the amount of I/O spend in the subrequests.
