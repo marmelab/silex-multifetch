@@ -23,7 +23,11 @@ class Multifetcher
         $requests = array();
         foreach ($parameters as $resource => $url) {
             $requests[$resource] = function () use ($resource, $url, $renderer) {
-                $response = $renderer($url);
+                try {
+                    $response = $renderer($url);
+                } catch (\Exception $e) {
+                    return false;
+                }
 
                 $headers = array();
                 foreach ($response->headers->all() as $name => $value) {
@@ -40,13 +44,23 @@ class Multifetcher
 
         if ($parallelize) {
             $parallel = new Parallel();
+            $responses = $parallel->values($requests);
 
-            return $parallel->values($requests);
+        } else {
+            foreach ($requests as $resource => $callback) {
+                $responses[$resource] = $callback();
+            }
         }
 
-        foreach ($requests as $resource => $callback) {
-            $responses[$resource] = $callback();
+        $error = false;
+        foreach ($responses as $k => $response) {
+            if (false === $response) {
+                unset($responses[$k]);
+
+                $error = true;
+            }
         }
+        $responses['_error'] = $error;
 
         return $responses;
     }
