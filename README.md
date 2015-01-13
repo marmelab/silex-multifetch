@@ -17,7 +17,7 @@ $app->register(new Silex\Provider\HttpFragmentServiceProvider());
 
 $app->register(new Marmelab\Multifetch\MultifetchServiceProvider(), array(
     'multifetch.url' => 'multi', // this is the default value
-    'mutltifetch.parallelize' => false, // this is the default value
+    'multifetch.parallel' => false, // this is the default value
 ));
 ```
 
@@ -32,10 +32,15 @@ make test
 
 ## Usage
 
-Send a request to the route where the provider is listening, passing the requests to fetch as query parameters. For instance, to fetch `/products/1` and `/users` into one HTTP call, make the following request:
+Send a request to the route where the provider is listening, passing the requests to fetch as a JSON object in the request body. For instance, to fetch `/products/1` and `/users` with a single HTTP request, make the following request:
 
 ```
-GET /multi?product=/product/1&all_users=/users HTTP/1.1
+POST /multi HTTP/1.1
+Content-Type: application/json
+{
+    "product": "/products/1",
+    "all_users": "/users"
+}
 ```
 
 The provider will call both HTTP resources, and return a response with a composite body once all the requests are fetched:
@@ -61,16 +66,36 @@ The provider will call both HTTP resources, and return a response with a composi
 
 Any header present in the multifetch request will be automatically added to all sub-requests.
 
-You can also fetch all requests in parallel using the `_parallel` query parameter:
+**Tip**: a GET route is available, the provider reads the query parameters to determine requests to fetch:
 
 ```
 GET /multi?product=/product/1&all_users=/users&_parallel=1 HTTP/1.1
 ```
 
-You can also, if you want, enable parallel fetching for all queries by setting `'mutltifetch.parallelize'` provider parameter to `true`. But in that case, if you want to disable parallelizing for only one query, you can do:
+# Parallelize requests
+
+You can also fetch all requests in parallel using the `_parallel`  parameter:
 
 ```
-GET /multi?product=/product/1&all_users=/users&_parallel=0 HTTP/1.1
+POST /multi HTTP/1.1
+Content-Type: application/json
+{
+    "product": "/products/1",
+    "all_users": "/users",
+    "_parallel": true
+}
+```
+
+You can also, if you want, enable parallel fetching for all queries by setting `'mutltifetch.parallel'` provider parameter to `true`. But in that case, if you want to disable parallelizing for only one query, you can do:
+
+```
+POST /multi HTTP/1.1
+Content-Type: application/json
+{
+    "product": "/products/1",
+    "all_users": "/users",
+    "_parallel": false
+}
 ```
 
 **Warning**: The `parallel` option forks a new thread for each sub-request, which may or may not be faster than executing all requests in series, depending on your usage scenario, and the amount of I/O spend in the subrequests.
