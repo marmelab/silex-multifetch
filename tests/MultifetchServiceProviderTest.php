@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testMultifetch()
+    public function testMultifetchGet()
     {
         $app = new Application();
 
@@ -25,7 +25,62 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
             return $app->json(array('field_2_1' => 'value_2_1', 'field_2' => 3));
         });
 
-        $request = Request::create('/multi/?one=/url1&two=/url2');
+        $request = Request::create('/multi/', 'GET', array('one' => '/url1', 'two' => '/url2'));
+        $response = $app->handle($request);
+
+        $responses = $this->getReponsesAsArray($response);
+        $this->assertEquals(array(
+            'one' => array(
+                'code' => 200,
+                'headers' =>
+                array(
+                    array(
+                        'name' => 'cache-control',
+                        'value' => 'no-cache',
+                    ),
+                    array(
+                        'name' => 'content-type',
+                        'value' => 'application/json',
+                    ),
+                ),
+                'body' => '{"field_1_1":"value_1_1","field_2":2}',
+            ),
+            'two' => array (
+                'code' => 200,
+                'headers' =>
+                array(
+                    array(
+                        'name' => 'cache-control',
+                        'value' => 'no-cache',
+                    ),
+                    array (
+                        'name' => 'content-type',
+                        'value' => 'application/json',
+                    ),
+                ),
+                'body' => '{"field_2_1":"value_2_1","field_2":3}',
+            ),
+        ), $responses);
+    }
+
+    public function testMultifetchPost()
+    {
+        $app = new Application();
+
+        $app->register(new HttpFragmentServiceProvider());
+        $app->register(new MultifetchServiceProvider());
+
+        $app->get('/url1', function () use ($app) {
+            return $app->json(array('field_1_1' => 'value_1_1', 'field_2' => 2));
+        });
+
+        $app->get('/url2', function () use ($app) {
+            return $app->json(array('field_2_1' => 'value_2_1', 'field_2' => 3));
+        });
+
+        $content = json_encode(array('one' => '/url1', 'two' => '/url2'));
+        $server = array('CONTENT_TYPE' => 'application/json');
+        $request = Request::create('/multi/', 'POST', array(), array(), array(), $server, $content);
         $response = $app->handle($request);
 
         $responses = $this->getReponsesAsArray($response);
@@ -80,7 +135,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
             return $app->json(array('field_2_1' => 'value_2_1', 'field_2' => 3));
         });
 
-        $request = Request::create('/?one=/url1&two=/url2');
+        $request = Request::create('/', 'GET', array('one' => '/url1', 'two' => '/url2'));
         $response = $app->handle($request);
 
         $responses = $this->getReponsesAsArray($response);
@@ -133,7 +188,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
             return $app->json(array('field_2_1' => 'value_2_1', 'field_2' => 3));
         });
 
-        $request = Request::create('/multi/?one=/url2&two=/url1');
+        $request = Request::create('/multi/', 'GET', array('one' => '/url2', 'two' => '/url1'));
         $response = $app->handle($request);
 
         $responses = $this->getReponsesAsArray($response);
@@ -188,7 +243,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
             return $app->json(array('field_2_1' => 'value_2_1', 'field_2' => 3));
         });
 
-        $request = Request::create('/multi/?one=/url1&two=/url2');
+        $request = Request::create('/multi/', 'GET', array('one' => '/url1', 'two' => '/url2'));
         $response = $app->handle($request);
 
         $responses = $this->getReponsesAsArray($response);
@@ -241,7 +296,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
             return $app->json(array('field_2_1' => 'value_2_1', 'field_2' => 3));
         });
 
-        $request = Request::create('/multi/?one=/url1&two=/url2&_parallel=1');
+        $request = Request::create('/multi/', 'GET', array('one' => '/url1', 'two' => '/url2', '_parallel' => 1));
         $response = $app->handle($request);
 
         $responses = $this->getReponsesAsArray($response);
@@ -296,7 +351,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
             return $app->json(array('field_2_1' => 'value_2_1', 'field_2' => 3));
         });
 
-        $request = Request::create('/multi/?one=/url1&two=/url2&_parallel=0');
+        $request = Request::create('/multi/', 'GET', array('one' => '/url1', 'two' => '/url2', '_parallel' => 0));
         $response = $app->handle($request);
 
         $responses = $this->getReponsesAsArray($response);

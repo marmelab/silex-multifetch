@@ -4,7 +4,7 @@ namespace Marmelab\Multifetch;
 
 use Silex\Application;
 use Silex\ServiceProviderInterface;
-use KzykHys\Parallel\Parallel;
+use Symfony\Component\HttpFoundation\Request;
 
 class MultifetchServiceProvider implements ServiceProviderInterface
 {
@@ -15,54 +15,32 @@ class MultifetchServiceProvider implements ServiceProviderInterface
 
         $app['multifetch.builder'] = function () use ($app) {
             $controllers = $app['controllers_factory'];
+            $renderer = function ($url) use ($app) {
+                return $app['fragment.renderer.inline']->render($url, $app['request']);
+            };
+            $multifetcher = new Multifetcher();
+            $parallelize = (bool) $app['multifetch.parallel'];
 
-            $controllers->get('/', function () use ($app) {
-                $parameters = $app['request']->query->all();
+            $controllers
+                ->get('/', function (Application $app) use ($multifetcher, $renderer, $parallelize) {
+                    $responses = $multifetcher->fetch($app['request']->query->all(), $renderer, $parallelize);
 
-                $parallelize = (bool) $app['multifetch.parallel'];
-                if (isset($parameters['_parallel'])) {
-                    $parallelize = (bool) $parameters['_parallel'];
-                    unset($parameters['_parallel']);
-                }
+                    return $app->json($responses);
+                })
+            ;
 
-                if ($parallelize && !class_exists('\KzykHys\Parallel\Parallel')) {
-                    throw new \RuntimeException(
-                        '"kzykhys/parallel" library is required to execute requests in parallel.
-                        To install it, run "composer require kzykhys/parallel 0.1"'
-                    );
-                }
+            $controllers
+                ->post('/', function (Application $app) use ($multifetcher, $renderer, $parallelize) {
+                    $responses = $multifetcher->fetch($app['request']->request->all(), $renderer, $parallelize);
 
-                $requests = array();
-                foreach ($parameters as $resource => $url) {
-                    $requests[$resource] = function () use ($resource, $url, $app) {
-                        $response = $app['fragment.renderer.inline']->render($url, $app['request']);
-
-                        $headers = array();
-                        foreach ($response->headers->all() as $name => $value) {
-                            $headers[] = array('name' => $name, 'value' => current($value));
-                        }
-
-                        return array(
-                            'code' => $response->getStatusCode(),
-                            'headers' => $headers,
-                            'body' => $response->getContent(),
-                        );
-                    };
-                }
-
-                if ($parallelize) {
-                    $parallel = new Parallel();
-                    $responses = $parallel->values($requests);
-
-                } else {
-                    foreach ($requests as $resource => $callback) {
-                        $responses[$resource] = $callback();
+                    return $app->json($responses);
+                })
+                ->before(function (Request $request) {
+                    if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
+                        $data = json_decode($request->getContent(), true);
+                        $request->request->replace(is_array($data) ? $data : array());
                     }
-                }
-
-                return $app->json($responses);
-            })
-            ->bind('multifetch')
+                })
             ;
 
             $app['controllers']->mount($app['multifetch.url'], $controllers);
