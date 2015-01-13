@@ -171,13 +171,13 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
         ), $responses);
     }
 
-    public function testMultifetchParallelizedGlobal()
+    public function testMultifetchParallelConfig()
     {
         $app = new Application();
 
         $app->register(new HttpFragmentServiceProvider());
         $app->register(new MultifetchServiceProvider(), array(
-            'multifetch.parallelize' => 1,
+            'multifetch.parallel' => 1,
         ));
 
         $app->get('/url1', function () use ($app) {
@@ -226,7 +226,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
         ), $responses);
     }
 
-    public function testMultifetchParallelizedParameter()
+    public function testMultifetchParallelParameter()
     {
         $app = new Application();
 
@@ -241,7 +241,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
             return $app->json(array('field_2_1' => 'value_2_1', 'field_2' => 3));
         });
 
-        $request = Request::create('/multi/?one=/url1&two=/url2&_parallelized=1');
+        $request = Request::create('/multi/?one=/url1&two=/url2&_parallel=1');
         $response = $app->handle($request);
 
         $responses = $this->getReponsesAsArray($response);
@@ -279,13 +279,13 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
         ), $responses);
     }
 
-    public function testMultifetchParallelizedGlobalOveriden()
+    public function testMultifetchParallelConfigOveriden()
     {
         $app = new Application();
 
         $app->register(new HttpFragmentServiceProvider());
         $app->register(new MultifetchServiceProvider(), array(
-            'multifetch.parallelize' => 1,
+            'multifetch.parallel' => 1,
         ));
 
         $app->get('/url1', function () use ($app) {
@@ -296,7 +296,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
             return $app->json(array('field_2_1' => 'value_2_1', 'field_2' => 3));
         });
 
-        $request = Request::create('/multi/?one=/url1&two=/url2&_parallelized=0');
+        $request = Request::create('/multi/?one=/url1&two=/url2&_parallel=0');
         $response = $app->handle($request);
 
         $responses = $this->getReponsesAsArray($response);

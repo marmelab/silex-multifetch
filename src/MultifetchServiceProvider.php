@@ -11,7 +11,7 @@ class MultifetchServiceProvider implements ServiceProviderInterface
     public function register(Application $app)
     {
         $app['multifetch.url'] = 'multi';
-        $app['multifetch.parallelize'] = false;
+        $app['multifetch.parallel'] = false;
 
         $app['multifetch.builder'] = function () use ($app) {
             $controllers = $app['controllers_factory'];
@@ -19,14 +19,17 @@ class MultifetchServiceProvider implements ServiceProviderInterface
             $controllers->get('/', function () use ($app) {
                 $parameters = $app['request']->query->all();
 
-                $parallelized = (bool) $app['multifetch.parallelize'];
-                if (isset($parameters['_parallelized'])) {
-                    $parallelized = (bool) $parameters['_parallelized'];
-                    unset($parameters['_parallelized']);
+                $parallelize = (bool) $app['multifetch.parallel'];
+                if (isset($parameters['_parallel'])) {
+                    $parallelize = (bool) $parameters['_parallel'];
+                    unset($parameters['_parallel']);
                 }
 
-                if ($parallelized && !class_exists('\KzykHys\Parallel\Parallel')) {
-                    throw new \RuntimeException('"kzykhys/parallel" library is required. To install it, run "composer require kzykhys/parallel 0.1"');
+                if ($parallelize && !class_exists('\KzykHys\Parallel\Parallel')) {
+                    throw new \RuntimeException(
+                        '"kzykhys/parallel" library is required to execute requests in parallel.
+                        To install it, run "composer require kzykhys/parallel 0.1"'
+                    );
                 }
 
                 $requests = array();
@@ -47,7 +50,7 @@ class MultifetchServiceProvider implements ServiceProviderInterface
                     };
                 }
 
-                if ($parallelized) {
+                if ($parallelize) {
                     $parallel = new Parallel();
                     $responses = $parallel->values($requests);
 

@@ -61,17 +61,19 @@ The provider will call both HTTP resources, and return a response with a composi
 
 Any header present in the multifetch request will be automatically added to all sub-requests.
 
-You can also fetch all requests in parallel using the `_parallelized` query parameter:
+You can also fetch all requests in parallel using the `_parallel` query parameter:
 
 ```
-GET /multi?product=/product/1&all_users=/users&_parallelized=1 HTTP/1.1
+GET /multi?product=/product/1&all_users=/users&_parallel=1 HTTP/1.1
 ```
 
 You can also, if you want, enable parallel fetching for all queries by setting `'mutltifetch.parallelize'` provider parameter to `true`. But in that case, if you want to disable parallelizing for only one query, you can do:
 
 ```
-GET /multi?product=/product/1&all_users=/users&_parallelized=0 HTTP/1.1
+GET /multi?product=/product/1&all_users=/users&_parallel=0 HTTP/1.1
 ```
+
+**Warning**: The `parallel` option forks a new thread for each sub-request, which may or may not be faster than executing all requests in series, depending on your usage scenario, and the amount of I/O spend in the subrequests.
 
 ## License
 
