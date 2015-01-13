@@ -10,26 +10,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testMultifetchGet()
+    private $fixture = array();
+
+    protected function setUp()
     {
-        $app = new Application();
-
-        $app->register(new HttpFragmentServiceProvider());
-        $app->register(new MultifetchServiceProvider());
-
-        $app->get('/url1', function () use ($app) {
-            return $app->json(array('field_1_1' => 'value_1_1', 'field_2' => 2));
-        });
-
-        $app->get('/url2', function () use ($app) {
-            return $app->json(array('field_2_1' => 'value_2_1', 'field_2' => 3));
-        });
-
-        $request = Request::create('/multi/', 'GET', array('one' => '/url1', 'two' => '/url2'));
-        $response = $app->handle($request);
-
-        $responses = $this->getReponsesAsArray($response);
-        $this->assertEquals(array(
+        $this->fixture = array(
             'one' => array(
                 'code' => 200,
                 'headers' =>
@@ -60,7 +45,29 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
                 ),
                 'body' => '{"field_2_1":"value_2_1","field_2":3}',
             ),
-        ), $responses);
+        );
+    }
+
+    public function testMultifetchGet()
+    {
+        $app = new Application();
+
+        $app->register(new HttpFragmentServiceProvider());
+        $app->register(new MultifetchServiceProvider());
+
+        $app->get('/url1', function () use ($app) {
+            return $app->json(array('field_1_1' => 'value_1_1', 'field_2' => 2));
+        });
+
+        $app->get('/url2', function () use ($app) {
+            return $app->json(array('field_2_1' => 'value_2_1', 'field_2' => 3));
+        });
+
+        $request = Request::create('/multi/', 'GET', array('one' => '/url1', 'two' => '/url2'));
+        $response = $app->handle($request);
+
+        $responses = $this->getReponsesAsArray($response);
+        $this->assertEquals($this->fixture, $responses);
     }
 
     public function testMultifetchPost()
@@ -84,38 +91,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
         $response = $app->handle($request);
 
         $responses = $this->getReponsesAsArray($response);
-        $this->assertEquals(array(
-            'one' => array(
-                'code' => 200,
-                'headers' =>
-                array(
-                    array(
-                        'name' => 'cache-control',
-                        'value' => 'no-cache',
-                    ),
-                    array(
-                        'name' => 'content-type',
-                        'value' => 'application/json',
-                    ),
-                ),
-                'body' => '{"field_1_1":"value_1_1","field_2":2}',
-            ),
-            'two' => array (
-                'code' => 200,
-                'headers' =>
-                array(
-                    array(
-                        'name' => 'cache-control',
-                        'value' => 'no-cache',
-                    ),
-                    array (
-                        'name' => 'content-type',
-                        'value' => 'application/json',
-                    ),
-                ),
-                'body' => '{"field_2_1":"value_2_1","field_2":3}',
-            ),
-        ), $responses);
+        $this->assertEquals($this->fixture, $responses);
     }
 
     public function testMultifetchCustomUrl()
@@ -139,38 +115,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
         $response = $app->handle($request);
 
         $responses = $this->getReponsesAsArray($response);
-        $this->assertEquals(array(
-            'one' => array(
-                'code' => 200,
-                'headers' =>
-                array(
-                    array(
-                        'name' => 'cache-control',
-                        'value' => 'no-cache',
-                    ),
-                    array(
-                        'name' => 'content-type',
-                        'value' => 'application/json',
-                    ),
-                ),
-                'body' => '{"field_1_1":"value_1_1","field_2":2}',
-            ),
-            'two' => array (
-                'code' => 200,
-                'headers' =>
-                array(
-                    array(
-                        'name' => 'cache-control',
-                        'value' => 'no-cache',
-                    ),
-                    array (
-                        'name' => 'content-type',
-                        'value' => 'application/json',
-                    ),
-                ),
-                'body' => '{"field_2_1":"value_2_1","field_2":3}',
-            ),
-        ), $responses);
+        $this->assertEquals($this->fixture, $responses);
     }
 
     public function testMultifetchRespectOrder()
@@ -193,36 +138,8 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
 
         $responses = $this->getReponsesAsArray($response);
         $this->assertEquals(array(
-            'one' => array(
-                'code' => 200,
-                'headers' =>
-                array(
-                    array(
-                        'name' => 'cache-control',
-                        'value' => 'no-cache',
-                    ),
-                    array(
-                        'name' => 'content-type',
-                        'value' => 'application/json',
-                    ),
-                ),
-                'body' => '{"field_2_1":"value_2_1","field_2":3}',
-            ),
-            'two' => array (
-                'code' => 200,
-                'headers' =>
-                array(
-                    array(
-                        'name' => 'cache-control',
-                        'value' => 'no-cache',
-                    ),
-                    array (
-                        'name' => 'content-type',
-                        'value' => 'application/json',
-                    ),
-                ),
-                'body' => '{"field_1_1":"value_1_1","field_2":2}',
-            ),
+            'one' => $this->fixture['two'],
+            'two' => $this->fixture['one'],
         ), $responses);
     }
 
@@ -247,38 +164,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
         $response = $app->handle($request);
 
         $responses = $this->getReponsesAsArray($response);
-        $this->assertEquals(array(
-            'one' => array(
-                'code' => 200,
-                'headers' =>
-                array(
-                    array(
-                        'name' => 'cache-control',
-                        'value' => 'no-cache',
-                    ),
-                    array(
-                        'name' => 'content-type',
-                        'value' => 'application/json',
-                    ),
-                ),
-                'body' => '{"field_1_1":"value_1_1","field_2":2}',
-            ),
-            'two' => array (
-                'code' => 200,
-                'headers' =>
-                array(
-                    array(
-                        'name' => 'cache-control',
-                        'value' => 'no-cache',
-                    ),
-                    array (
-                        'name' => 'content-type',
-                        'value' => 'application/json',
-                    ),
-                ),
-                'body' => '{"field_2_1":"value_2_1","field_2":3}',
-            ),
-        ), $responses);
+        $this->assertEquals($this->fixture, $responses);
     }
 
     public function testMultifetchParallelParameter()
@@ -300,38 +186,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
         $response = $app->handle($request);
 
         $responses = $this->getReponsesAsArray($response);
-        $this->assertEquals(array(
-            'one' => array(
-                'code' => 200,
-                'headers' =>
-                array(
-                    array(
-                        'name' => 'cache-control',
-                        'value' => 'no-cache',
-                    ),
-                    array(
-                        'name' => 'content-type',
-                        'value' => 'application/json',
-                    ),
-                ),
-                'body' => '{"field_1_1":"value_1_1","field_2":2}',
-            ),
-            'two' => array (
-                'code' => 200,
-                'headers' =>
-                array(
-                    array(
-                        'name' => 'cache-control',
-                        'value' => 'no-cache',
-                    ),
-                    array (
-                        'name' => 'content-type',
-                        'value' => 'application/json',
-                    ),
-                ),
-                'body' => '{"field_2_1":"value_2_1","field_2":3}',
-            ),
-        ), $responses);
+        $this->assertEquals($this->fixture, $responses);
     }
 
     public function testMultifetchParallelConfigOveriden()
@@ -355,38 +210,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
         $response = $app->handle($request);
 
         $responses = $this->getReponsesAsArray($response);
-        $this->assertEquals(array(
-            'one' => array(
-                'code' => 200,
-                'headers' =>
-                array(
-                    array(
-                        'name' => 'cache-control',
-                        'value' => 'no-cache',
-                    ),
-                    array(
-                        'name' => 'content-type',
-                        'value' => 'application/json',
-                    ),
-                ),
-                'body' => '{"field_1_1":"value_1_1","field_2":2}',
-            ),
-            'two' => array (
-                'code' => 200,
-                'headers' =>
-                array(
-                    array(
-                        'name' => 'cache-control',
-                        'value' => 'no-cache',
-                    ),
-                    array (
-                        'name' => 'content-type',
-                        'value' => 'application/json',
-                    ),
-                ),
-                'body' => '{"field_2_1":"value_2_1","field_2":3}',
-            ),
-        ), $responses);
+        $this->assertEquals($this->fixture, $responses);
     }
 
     public function testMultifetchRequestsError()
@@ -414,37 +238,7 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
         $response = $app->handle($request);
 
         $responses = $this->getReponsesAsArray($response);
-        $this->assertEquals(array(
-            'one' => array(
-                'code' => 200,
-                'headers' =>
-                array(
-                    array(
-                        'name' => 'cache-control',
-                        'value' => 'no-cache',
-                    ),
-                    array(
-                        'name' => 'content-type',
-                        'value' => 'application/json',
-                    ),
-                ),
-                'body' => '{"field_1_1":"value_1_1","field_2":2}',
-            ),
-            'two' => array(
-                'code' => 200,
-                'headers' =>
-                array(
-                    array(
-                        'name' => 'cache-control',
-                        'value' => 'no-cache',
-                    ),
-                    array (
-                        'name' => 'content-type',
-                        'value' => 'application/json',
-                    ),
-                ),
-                'body' => '{"field_2_1":"value_2_1","field_2":3}',
-            ),
+        $this->assertEquals($this->fixture + array(
             'three' => array(
                 'code' => 404,
                 'headers' => array(),
