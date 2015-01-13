@@ -48,19 +48,20 @@ The provider will call both HTTP resources, and return a response with a composi
 ```json
 { 
     "product": {
-        "code":"200",
-        "headers":[
+        "code": 200,                // Response code returned by the user route
+        "headers": [                                    // All response headers
             { "name": "Content-Type", "value": "application/json" }
         ],
-        "body": "{ id: 1, name: \"ipad2\", stock: 34 }"
+        "body": "{ id: 1, name: \"ipad2\", stock: 34 }" // The actual json body
     },
     "all_users": {
-        "code":"200",
-        "headers":[
+        "code": 200,
+        "headers": [
             { "name": "Content-Type", "value": "application/json" }
         ],
         "body": "[{ id: 2459, login: \"paul\" }, { id: 7473, login: \"joe\" }]"
-    }
+    },
+    "_error": false        // _error will be true if one of the requests failed
 }
 ```
 
