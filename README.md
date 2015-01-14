@@ -17,6 +17,7 @@ $app->register(new Silex\Provider\HttpFragmentServiceProvider());
 
 $app->register(new Marmelab\Multifetch\MultifetchServiceProvider(), array(
     'multifetch.url' => 'multi', // this is the default value
+    'multifetch.methods' => array('POST'), // this is the default value
     'multifetch.parallel' => false, // this is the default value
     'multifetch.headers' => true, // this is the default value
 ));
@@ -67,11 +68,17 @@ The provider will call both HTTP resources, and return a response with a composi
 
 Any header present in the multifetch request will be automatically added to all sub-requests.
 
-**Tip**: a GET route is available, the provider reads the query parameters to determine requests to fetch:
+### Request method
+
+A `GET` route is available.
+To enable it, just set the `multifetch.methods` provider configuration to `array('GET')`.
+The provider reads the query parameters to determine requests to fetch:
 
 ```
 GET /multi?product=/product/1&all_users=/users&_parallel=1 HTTP/1.1
 ```
+
+If we want to enable both `POST` and `GET` routes, set `array('POST', 'GET')` value for configuration.
 
 ### Parallelize requests
 
