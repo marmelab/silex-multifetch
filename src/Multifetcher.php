@@ -23,8 +23,8 @@ class Multifetcher
 
         if ($options['parallel'] && !class_exists('\KzykHys\Parallel\Parallel')) {
             throw new \RuntimeException(
-                '"kzykhys/parallel" library is required to execute requests in parallel.
-                To install it, run "composer require kzykhys/parallel 0.1"'
+                '"tiagobutzke/phparallel" library is required to execute requests in parallel.
+                To install it, run "composer require tiagobutzke/phparallel 0.1"'
             );
         }
 

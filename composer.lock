@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1c506688a9aa074f2762b13c105310bc",
+    "hash": "47d4d1dc5ffa182c0c66a785ef184535",
     "packages": [
         {
             "name": "pimple/pimple",
@@ -1388,16 +1388,16 @@
         },
         {
             "name": "tiagobutzke/phparallel",
-            "version": "v0.1.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tiagobutzke/PHParallel.git",
-                "reference": "d15bc88f06d279112a0facb6607072dfb48dfc6f"
+                "reference": "0aea0f965b14a4f18f673271af782f87b5d634c3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tiagobutzke/PHParallel/zipball/d15bc88f06d279112a0facb6607072dfb48dfc6f",
-                "reference": "d15bc88f06d279112a0facb6607072dfb48dfc6f",
+                "url": "https://api.github.com/repos/tiagobutzke/PHParallel/zipball/0aea0f965b14a4f18f673271af782f87b5d634c3",
+                "reference": "0aea0f965b14a4f18f673271af782f87b5d634c3",
                 "shasum": ""
             },
             "require-dev": {
@@ -1420,13 +1420,15 @@
                 }
             ],
             "description": "Simple multitasking library",
-            "time": "2014-02-04 13:24:07"
+            "time": "2015-01-13 21:18:46"
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": [],
-    "prefer-stable": false,
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "tiagobutzke/phparallel": 20
+    },
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": []
