@@ -1,10 +1,10 @@
 # Marmelab Silex Multifetch
 
-Multifetch is a Silex provider which add multifetch capabilities to your Silex project. Based on [Facebook's Batch Requests philosophy](https://developers.facebook.com/docs/graph-api/making-multiple-requests).
+Multifetch is a Silex provider which adds multifetch capabilities to any Silex project. Based on [Facebook's Batch Requests philosophy](https://developers.facebook.com/docs/graph-api/making-multiple-requests).
 
 ## Installation
 
-To install Silex Multifetch provider, run the command below and you will get the latest version:
+Use Composer to install the package in your project:
 
 ```bash
 composer require marmelab/silex-multifetch "~1.0@dev"
@@ -23,18 +23,9 @@ $app->register(new Marmelab\Multifetch\MultifetchServiceProvider(), array(
 ));
 ```
 
-## Tests
-
-Run the tests suite with the following commands:
-
-```bash
-make install
-make test
-```
-
 ## Usage
 
-Send a request to the route where the provider is listening, passing the requests to fetch as a JSON object in the request body. For instance, to fetch `/products/1` and `/users` with a single HTTP request, make the following request:
+Send a request to the route where the provider is listening ('/multi' by default), and pass the requests to be fetched as a JSON object in the request body. For instance, to fetch `/products/1` and `/users` with a single HTTP request, make the following request:
 
 ```
 POST /multi HTTP/1.1
@@ -70,19 +61,19 @@ Any header present in the multifetch request will be automatically added to all 
 
 ### Request method
 
-A `GET` route is available.
-To enable it, just set the `multifetch.methods` provider configuration to `array('GET')`.
-The provider reads the query parameters to determine requests to fetch:
+By default, the '/multi' route listens only for POST requests. However, you can configure the provider to also (or only) accept `GET` requests. To enable it, just set the `multifetch.methods` provider configuration to `array('GET')`.
+
+The provider then reads the query parameters to determine the requests to fetch:
 
 ```
-GET /multi?product=/product/1&all_users=/users&_parallel=1 HTTP/1.1
+GET /multi?product=/product/1&all_users=/users HTTP/1.1
 ```
 
-If we want to enable both `POST` and `GET` routes, set `array('POST', 'GET')` value for configuration.
+If you want to enable both `POST` and `GET` routes, set `array('POST', 'GET')` value a `multifetch.methods` value.
 
 ### Parallelize requests
 
-All requests can be fetched in parallel using the `_parallel`  parameter:
+A multifetch request can fetche subrequests in parallel, if you add the `_parallel` parameter:
 
 ```
 POST /multi HTTP/1.1
@@ -94,7 +85,7 @@ Content-Type: application/json
 }
 ```
 
-You can also, if you want, enable parallel fetching for all queries by setting `'mutltifetch.parallel'` provider parameter to `true`. But in that case, if you want to disable parallelizing for only one query, you can do:
+You can also, if you want, enable parallel fetching for all queries by setting the `'mutltifetch.parallel'` provider parameter to `true`. In that case, if you want to disable parallel fetching for only one query, you can do:
 
 ```
 POST /multi HTTP/1.1
@@ -106,7 +97,7 @@ Content-Type: application/json
 }
 ```
 
-**Warning**: The `parallel` option forks a new thread for each sub-request, which may or may not be faster than executing all requests in series, depending on your usage scenario, and the amount of I/O spend in the subrequests.
+**Warning**: The `parallel` option forks a new thread for each sub-request, which may or may not be faster than executing all requests in series, depending on your usage scenario, and the amount of I/O spent in the subrequests.
 
 ### Removing headers from the response
 
@@ -126,11 +117,19 @@ You can also remove `headers` from the response for all your queries by setting 
 
 ### Errors
 
-It's possible that one of your requested operation may throw an error.
-A similar response will be return, but with a custom status and body.
-Successfull requests will be returned, as normal, with a 200 status code.
+It's possible that one of your requested operation may throw an error. A similar response will be returned, but with a custom status and body. Successfull requests will be returned, as normal, with a 200 status code.
 
 Here is a response example:
+
+```
+POST /multi HTTP/1.1
+Content-Type: application/json
+{
+    "product": "/products/1",
+    "all_users": "/non_existing_route",
+    "single_user": "/users/brian" // will trigger a 500 error
+}
+```
 
 ```json
 {
@@ -141,17 +140,26 @@ Here is a response example:
         ],
         "body": "{ id: 1, name: \"ipad2\", stock: 34 }"
     },
-    "not_found": {
+    "all_users": {
         "code": 404,
         "headers": [],
-        "body": "{ error: \"No route found for \\\"GET \\\/no-route\\\"\", type: \"NotFoundHttpException\" }"
+        "body": "{ error: \"No route found for \\\"GET \\\/non_existing_route\\\"\", type: \"NotFoundHttpException\" }"
     },
-    "error": {
+    "single_user": {
         "code": 500,
         "headers": [],
         "body": "{ error: \"Oops! Something went wrong.\", type: \"InternalServerError\" }"
     },
 }
+```
+
+## Tests
+
+Run the tests suite with the following commands:
+
+```bash
+make install
+make test
 ```
 
 ## License
