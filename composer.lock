@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "87d1dbfa6233e11d0638131f011432ee",
+    "hash": "1c506688a9aa074f2762b13c105310bc",
     "packages": [
         {
             "name": "pimple/pimple",
@@ -537,42 +537,6 @@
                 "instantiate"
             ],
             "time": "2014-10-13 12:58:55"
-        },
-        {
-            "name": "kzykhys/parallel",
-            "version": "v0.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/kzykhys/Parallel.php.git",
-                "reference": "d15bc88f06d279112a0facb6607072dfb48dfc6f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/kzykhys/Parallel.php/zipball/d15bc88f06d279112a0facb6607072dfb48dfc6f",
-                "reference": "d15bc88f06d279112a0facb6607072dfb48dfc6f",
-                "shasum": ""
-            },
-            "require-dev": {
-                "phpunit/php-code-coverage": "1.2.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Kazuyuki Hayashi",
-                    "email": "hayashi@valnur.net"
-                }
-            ],
-            "description": "Simple multitasking library",
-            "time": "2014-02-04 13:24:07"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -1421,6 +1385,42 @@
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
             "time": "2015-01-03 15:33:07"
+        },
+        {
+            "name": "tiagobutzke/phparallel",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tiagobutzke/PHParallel.git",
+                "reference": "d15bc88f06d279112a0facb6607072dfb48dfc6f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tiagobutzke/PHParallel/zipball/d15bc88f06d279112a0facb6607072dfb48dfc6f",
+                "reference": "d15bc88f06d279112a0facb6607072dfb48dfc6f",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/php-code-coverage": "1.2.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kazuyuki Hayashi",
+                    "email": "hayashi@valnur.net"
+                }
+            ],
+            "description": "Simple multitasking library",
+            "time": "2014-02-04 13:24:07"
         }
     ],
     "aliases": [],
