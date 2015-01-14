@@ -8,8 +8,6 @@
             "email": "jerome@marmelab.com"
         }
     ],
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "require": {
         "silex/silex": "~1.2"
     },
@@ -17,7 +15,7 @@
         "phpunit/phpunit": "~4.2.0",
         "symfony/browser-kit": "~2.3",
         "symfony/css-selector": "~2.3",
-        "tiagobutzke/phparallel": "dev-master"
+        "tiagobutzke/phparallel": "~0.1"
     },
     "suggest": {
         "tiagobutzke/phparallel": "Allows parallelize requests fetching"

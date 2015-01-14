@@ -73,14 +73,10 @@ If you want to enable both `POST` and `GET` routes, set `array('POST', 'GET')` v
 
 ### Parallelize requests
 
-To be able to use parralel fetch feature, you must install `Parallel.php` library.
-
-**Warning**: Your `composer.json` must contain `minimum-stability` set to `dev`. I advice you to set `prefer-stable` to `true` in order to avoid the update of all other stable dependencies.
-
-Use Composer to install the package in your project:
+To be able to use parallel fetching feature, you must install `Parallel.php` library. Use Composer to install it:
 
 ```bash
-composer require tiagobutzke/phparallel "dev-master"
+composer require tiagobutzke/phparallel "~0.1"
 ```
 
 A multifetch request can fetche subrequests in parallel, if you add the `_parallel` parameter:

@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "47d4d1dc5ffa182c0c66a785ef184535",
+    "hash": "32f5b7c8ba7156eec1e53748c2a52bb3",
     "packages": [
         {
             "name": "pimple/pimple",
@@ -1388,7 +1388,7 @@
         },
         {
             "name": "tiagobutzke/phparallel",
-            "version": "dev-master",
+            "version": "0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tiagobutzke/PHParallel.git",
@@ -1424,11 +1424,9 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "dev",
-    "stability-flags": {
-        "tiagobutzke/phparallel": 20
-    },
-    "prefer-stable": true,
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": []
