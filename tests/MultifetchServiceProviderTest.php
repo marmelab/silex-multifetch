@@ -458,10 +458,47 @@ class MultifetchServiceProviderTest extends \PHPUnit_Framework_TestCase
         ), $responses);
     }
 
+    public function testMultifetchWithoutHeaders()
+    {
+        $app = new Application();
+
+        $app->register(new HttpFragmentServiceProvider());
+        $app->register(new MultifetchServiceProvider(), array(
+            'multifetch.headers' => false,
+        ));
+
+        $app->get('/url1', function () use ($app) {
+            return $app->json(array('field_1_1' => 'value_1_1', 'field_2' => 2));
+        });
+
+        $app->get('/url2', function () use ($app) {
+            return $app->json(array('field_2_1' => 'value_2_1', 'field_2' => 3));
+        });
+
+        $request = Request::create('/multi/', 'GET', array('one' => '/url1', 'two' => '/url2'));
+        $response = $app->handle($request);
+
+        $responses = $this->getReponsesAsArray($response);
+        $this->assertEquals(array(
+            'one' => array(
+                'code' => 200,
+                'body' => '{"field_1_1":"value_1_1","field_2":2}',
+            ),
+            'two' => array (
+                'code' => 200,
+                'body' => '{"field_2_1":"value_2_1","field_2":3}',
+            ),
+        ), $responses);
+    }
+
     private function getReponsesAsArray(Response $response)
     {
         $responses = json_decode($response->getContent(), true);
         foreach ($responses as $key => $singleResponse) {
+            if (!isset($singleResponse['headers'])) {
+                continue;
+            }
+
             $headers = array();
             foreach ($singleResponse['headers'] as $header) {
                 if ('date' === $header['name']) {

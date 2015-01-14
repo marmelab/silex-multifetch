@@ -7,14 +7,21 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Multifetcher
 {
-    public function fetch(array $parameters, $renderer, $parallelize = false)
+    public function fetch(array $parameters, $renderer, array $options = array())
     {
-        if (isset($parameters['_parallel'])) {
-            $parallelize = (bool) $parameters['_parallel'];
-            unset($parameters['_parallel']);
+        $options = array_replace(array(
+            'parallel' => false,
+            'headers' => true,
+        ), $options);
+
+        foreach ($options as $name => $value) {
+            if (isset($parameters['_'.$name])) {
+                $options[$name] = $parameters['_'.$name];
+                unset($parameters['_'.$name]);
+            }
         }
 
-        if ($parallelize && !class_exists('\KzykHys\Parallel\Parallel')) {
+        if ($options['parallel'] && !class_exists('\KzykHys\Parallel\Parallel')) {
             throw new \RuntimeException(
                 '"kzykhys/parallel" library is required to execute requests in parallel.
                 To install it, run "composer require kzykhys/parallel 0.1"'
@@ -53,14 +60,21 @@ class Multifetcher
             };
         }
 
-        if ($parallelize) {
+        if ($options['parallel']) {
             $parallel = new Parallel();
 
-            return $parallel->values($requests);
+            $responses = $parallel->values($requests);
+
+        } else {
+            foreach ($requests as $resource => $callback) {
+                $responses[$resource] = $callback();
+            }
         }
 
-        foreach ($requests as $resource => $callback) {
-            $responses[$resource] = $callback();
+        if (!$options['headers']) {
+            array_walk($responses, function (&$value) {
+                unset($value['headers']);
+            });
         }
 
         return $responses;

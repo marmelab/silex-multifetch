@@ -12,6 +12,7 @@ class MultifetchServiceProvider implements ServiceProviderInterface
     {
         $app['multifetch.url'] = 'multi';
         $app['multifetch.parallel'] = false;
+        $app['multifetch.headers'] = true;
 
         $app['multifetch.builder'] = function () use ($app) {
             $controllers = $app['controllers_factory'];
@@ -19,19 +20,22 @@ class MultifetchServiceProvider implements ServiceProviderInterface
                 return $app['fragment.renderer.inline']->render($url, $app['request']);
             };
             $multifetcher = new Multifetcher();
-            $parallelize = (bool) $app['multifetch.parallel'];
+            $options = array(
+                'parallel' => (bool) $app['multifetch.parallel'],
+                'headers' => (bool) $app['multifetch.headers'],
+            );
 
             $controllers
-                ->get('/', function (Application $app) use ($multifetcher, $renderer, $parallelize) {
-                    $responses = $multifetcher->fetch($app['request']->query->all(), $renderer, $parallelize);
+                ->get('/', function (Application $app) use ($multifetcher, $renderer, $options) {
+                    $responses = $multifetcher->fetch($app['request']->query->all(), $renderer, $options);
 
                     return $app->json($responses);
                 })
             ;
 
             $controllers
-                ->post('/', function (Application $app) use ($multifetcher, $renderer, $parallelize) {
-                    $responses = $multifetcher->fetch($app['request']->request->all(), $renderer, $parallelize);
+                ->post('/', function (Application $app) use ($multifetcher, $renderer, $options) {
+                    $responses = $multifetcher->fetch($app['request']->request->all(), $renderer, $options);
 
                     return $app->json($responses);
                 })

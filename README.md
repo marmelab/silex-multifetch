@@ -18,6 +18,7 @@ $app->register(new Silex\Provider\HttpFragmentServiceProvider());
 $app->register(new Marmelab\Multifetch\MultifetchServiceProvider(), array(
     'multifetch.url' => 'multi', // this is the default value
     'multifetch.parallel' => false, // this is the default value
+    'multifetch.headers' => true, // this is the default value
 ));
 ```
 
@@ -74,7 +75,7 @@ GET /multi?product=/product/1&all_users=/users&_parallel=1 HTTP/1.1
 
 ### Parallelize requests
 
-You can also fetch all requests in parallel using the `_parallel`  parameter:
+All requests can be fetched in parallel using the `_parallel`  parameter:
 
 ```
 POST /multi HTTP/1.1
@@ -99,6 +100,22 @@ Content-Type: application/json
 ```
 
 **Warning**: The `parallel` option forks a new thread for each sub-request, which may or may not be faster than executing all requests in series, depending on your usage scenario, and the amount of I/O spend in the subrequests.
+
+### Removing headers from the response
+
+You may want to remove `headers` from response for more efficiency. Set the `_headers` parameter to `false` in your query:
+
+```
+POST /multi HTTP/1.1
+Content-Type: application/json
+{
+    "product": "/products/1",
+    "all_users": "/users",
+    "_headers": false
+}
+```
+
+You can also remove `headers` from the response for all your queries by setting `multifetch.headers` to `false` in the provider configuration.
 
 ### Errors
 
