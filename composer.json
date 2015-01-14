@@ -15,10 +15,10 @@
         "phpunit/phpunit": "~4.2.0",
         "symfony/browser-kit": "~2.3",
         "symfony/css-selector": "~2.3",
-        "kzykhys/parallel": "0.1"
+        "tiagobutzke/phparallel": "0.1"
     },
     "suggest": {
-        "kzykhys/parallel": "Allows parallelize requests"
+        "tiagobutzke/phparallel": "Allows parallelize requests fetching"
     },
     "autoload": {
         "psr-4": {
