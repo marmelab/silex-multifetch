@@ -110,7 +110,7 @@ Content-Type: application/json
 
 ### Removing headers from the response
 
-You may want to remove `headers` from response for more efficiency. Set the `_headers` parameter to `false` in your query:
+You may want to remove `headers` from the response for more efficiency. Set the `_headers` parameter to `false` in your query:
 
 ```
 POST /multi HTTP/1.1
